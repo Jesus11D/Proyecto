@@ -28,3 +28,14 @@ public class Proyecto {
             }
         } while (opcion != 5);
     }
+
+    public static void ejecutarBurbuja() {
+        int[] arr = {5, 3, 8, 4, 2};
+        JOptionPane.showMessageDialog(null, "Arreglo original: " + Arrays.toString(arr));
+        long start = System.nanoTime();
+        burbuja(arr);
+        long end = System.nanoTime();
+        JOptionPane.showMessageDialog(null, "Arreglo ordenado: " + Arrays.toString(arr)
+                + "\nComplejidad: O(n^2)"
+                + "\nTiempo: " + (end - start) + " ns");
+    }
