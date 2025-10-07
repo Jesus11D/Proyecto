@@ -1,42 +1,69 @@
-import javax.swing.*;
 import java.io.*;
 import java.util.*;
+import javax.swing.*;
 
-public class Proyecto {
+public class BusquedaInvertida {
+
+    static Map<String, Set<String>> indiceInvertido = new HashMap<>();
+    static List<String> listaDocumentos = new ArrayList<>();
 
     public static void main(String[] args) {
-        String menu = """
-                      Selecciona una opción:
-                      1. Ordenación Interna - Burbuja
-                      2. Ordenación Interna - Inserción
-                      3. Ordenación Interna - QuickSort
-                      4. Ordenación Externa (leer archivo .txt)
-                      5. Salir
-                      6. Uso de Tablas Hash""";
+        try {
+            inicializarDocumentos();
+            indexarDocumentos();
 
-        int opcion;
-        do {
-            opcion = Integer.parseInt(JOptionPane.showInputDialog(menu));
-            switch (opcion) {
-                case 1 -> ejecutarBurbuja();
-                case 2 -> ejecutarInsercion();
-                case 3 -> ejecutarQuickSort();
-                case 4 -> ejecutarOrdenacionExterna();
-                case 5 -> JOptionPane.showMessageDialog(null, "Saliendo del programa...");
-                case 6 -> ejecutarHash();
-                default -> JOptionPane.showMessageDialog(null, "Opción inválida");
+            String palabra = JOptionPane.showInputDialog("Ingrese palabra a buscar:");
+            Set<String> resultados = buscarPalabra(palabra.toLowerCase());
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("Diccionario de términos:\n");
+            for (String termino : indiceInvertido.keySet()) {
+                sb.append(termino).append(" -> ").append(indiceInvertido.get(termino)).append("\n");
             }
-        } while (opcion != 5);
+            sb.append("\nLista de documentos:\n");
+            for (String doc : listaDocumentos) sb.append(doc).append("\n");
+
+            sb.append("\nResultados de búsqueda para '").append(palabra).append("':\n");
+            if (resultados.isEmpty()) sb.append("No se encontró en ningún documento");
+            else for (String doc : resultados) sb.append("- ").append(doc).append("\n");
+
+            JOptionPane.showMessageDialog(null, sb.toString());
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error: " + e.getMessage());
+        }
     }
 
-    public static void ejecutarBurbuja() {
-        int[] arr = {5, 3, 8, 4, 2};
-        JOptionPane.showMessageDialog(null, "Arreglo original: " + Arrays.toString(arr));
-        long start = System.nanoTime();
-        burbuja(arr);
-        long end = System.nanoTime();
-        JOptionPane.showMessageDialog(null, "Arreglo ordenado: " + Arrays.toString(arr)
-                + "\nComplejidad: O(n^2)"
-                + "\nTiempo: " + (end - start) + " ns");
+    static void inicializarDocumentos() throws IOException {
+        for (int i = 1; i <= 3; i++) {
+            File f = new File("doc" + i + ".txt");
+            if (!f.exists()) {
+                try (PrintWriter pw = new PrintWriter(f)) {
+                    if (i == 1) pw.println("El zorro veloz corre por el bosque");
+                    if (i == 2) pw.println("El perro duerme bajo el arbol");
+                    if (i == 3) pw.println("El gato salta sobre el muro veloz");
+                }
+            }
+            listaDocumentos.add(f.getName());
+        }
     }
-sad
+
+    static void indexarDocumentos() throws IOException {
+        for (String nombreDoc : listaDocumentos) {
+            try (BufferedReader br = new BufferedReader(new FileReader(nombreDoc))) {
+                String linea;
+                while ((linea = br.readLine()) != null) {
+                    String[] palabras = linea.toLowerCase().replaceAll("[^a-záéíóúñ ]", "").split("\\s+");
+                    for (String p : palabras) {
+                        if (!indiceInvertido.containsKey(p)) indiceInvertido.put(p, new HashSet<>());
+                        indiceInvertido.get(p).add(nombreDoc);
+                    }
+                }
+            }
+        }
+    }
+
+    static Set<String> buscarPalabra(String palabra) {
+        return indiceInvertido.getOrDefault(palabra.toLowerCase(), new HashSet<>());
+    }
+}
