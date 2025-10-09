@@ -67,4 +67,3 @@ public class BusquedaInvertida {
         return indiceInvertido.getOrDefault(palabra.toLowerCase(), new HashSet<>());
     }
 }
-oi
