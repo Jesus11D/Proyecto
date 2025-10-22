@@ -66,4 +66,5 @@ public class BusquedaInvertida {
     static Set<String> buscarPalabra(String palabra) {
         return indiceInvertido.getOrDefault(palabra.toLowerCase(), new HashSet<>());
     }
-}
+}d
+asdada
